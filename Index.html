@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLAMES Game with Progress Bar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #333;
+    }
+    .container {
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      max-width: 400px;
+    }
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 80%;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #444;
+      font-weight: bold;
+    }
+    .progress-container {
+      width: 80%;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin: 20px auto;
+      height: 25px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #e44d26;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      transition: width 0.5s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>FLAMES Game with Progress Bar</h1>
+  <div class="container">
+    <p>Enter two names to calculate FLAMES:</p>
+    <input type="text" id="name1" placeholder="Enter first name" />
+    <input type="text" id="name2" placeholder="Enter second name" />
+    <br />
+    <button onclick="calculateFLAMES()">Calculate</button>
+    <div id="result"></div>
+    <div class="progress-container">
+      <div id="progress-bar" class="progress-bar">0%</div>
+    </div>
+  </div>
+
+  <script>
+    function calculateFLAMES() {
+      let name1 = document.getElementById("name1").value.toLowerCase().replace(/\s+/g, "");
+      let name2 = document.getElementById("name2").value.toLowerCase().replace(/\s+/g, "");
+
+      if (!name1 || !name2) {
+        document.getElementById("result").innerText = "Please enter both names.";
+        return;
+      }
+
+      // Remove common letters only once
+      const arr1 = name1.split("");
+      const arr2 = name2.split("");
+
+      for (let i = 0; i < arr1.length; i++) {
+        const index = arr2.indexOf(arr1[i]);
+        if (index !== -1) {
+          arr1[i] = ""; // Remove letter from first name
+          arr2[index] = ""; // Remove the same letter (once) from the second name
+        }
+      }
+
+      // Combine the remaining letters and get the total count
+      const remainingCount = [...arr1.join(""), ...arr2.join("")].length;
+
+      // FLAMES logic
+      const flames = ["Friend", "Lover", "Affection", "Marriage", "Enemy", "Sibling"];
+      let index = 0;
+
+      while (flames.length > 1) {
+        index = (index + remainingCount - 1) % flames.length;
+        flames.splice(index, 1);
+      }
+
+      const result = flames[0];
+
+      // Calculate percentage
+      const maxLength = Math.max(name1.length, name2.length) * 2;
+      const lovePercentage = 100 - Math.round((remainingCount / maxLength) * 100);
+
+      document.getElementById("result").innerText = `The FLAMES result is: ${result}`;
+      animateProgressBar(lovePercentage);
+    }
+
+    function animateProgressBar(targetPercentage) {
+      const progressBar = document.getElementById("progress-bar");
+      let currentPercentage = 0;
+
+      // Step 1: Increase from 0% to 100%
+      const increaseInterval = setInterval(() => {
+        currentPercentage++;
+        progressBar.style.width = currentPercentage + "%";
+        progressBar.innerText = currentPercentage + "%";
+
+        if (currentPercentage === 100) {
+          clearInterval(increaseInterval);
+
+          // Step 2: Decrease to the target percentage
+          const decreaseInterval = setInterval(() => {
+            currentPercentage--;
+            progressBar.style.width = currentPercentage + "%";
+            progressBar.innerText = currentPercentage + "%";
+
+            if (currentPercentage === targetPercentage) {
+              clearInterval(decreaseInterval);
+            }
+          }, 20); // Decrease animation speed
+        }
+      }, 10); // Increase animation speed
+    }
+  </script>
+</body>
+</html>
+  
